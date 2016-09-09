@@ -6,9 +6,9 @@ IOx Proof of Concept to integrate a Cisco Router with an Arduino Microcontroller
 ### Table of Contents 
 
 * [Background](#background)
-* [Setup and PreRequisites](#setup_and_prerequisites)
-* [Loading Demo Application](#loading_demo_application)
-* [Running the Demo](#running_the_demo)
+* [Setup and PreRequisites](#setup-and-prerequisites)
+* [Loading Demo Application](#loading-demo-application)
+* [Running the Demo](#running-the-demo)
 
 ## Background
 
