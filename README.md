@@ -19,13 +19,13 @@ A challenges for the IOT application developer are:
 1. How to bridge the gap from what has been the serial communciation world of sensors, and the IP based Internet.  
 2. Where to run the applications that the monitor and interact with the external sensors.  
 
-Cisco looks to solve these challenges with the [Cisco IOx]() platform for Internet of Things applications.  Cisco has long been the leader in connecting people, applicaitons, business, etc to the Internet, and with IOx they now look to connect Things to the Internet.  
+Cisco looks to solve these challenges with the [Cisco IOx](https://developer.cisco.com/site/iox/index.gsp) platform for Internet of Things applications.  Cisco has long been the leader in connecting people, applicaitons, business, etc to the Internet, and with IOx they now look to connect Things to the Internet.  
 
 With IOx, application developers can run their IOT applications right at the edge of the network, close to the sensors and other devices (often called *Fog Computing*).  IOx Applications run directly on the Cisco Router that simulatneously provide the connectivity to the Internet or Intranet.  
 
 ## Arduino + Cisco IOx
 
-[Arduino]() is an OpenSource, inexpensive, and easy to leverage microcontroller platform which can be easily used to interact with serial and digital components such as: 
+[Arduino](https://www.arduino.cc) is an OpenSource, inexpensive, and easy to leverage microcontroller platform which can be easily used to interact with serial and digital components such as: 
 
 * Temperature, Motion, Pressure, Light, etc Sensors 
 * LED Lights for indictation
@@ -51,20 +51,20 @@ To build and replicate this demonstraiton you'll need access to an IOx device wi
 
 ## IOx Router/Host 
 
-[Cisco DevNet IOx Community]() is the best place for resources on developing with IOx.  Before beginning this, or any other IOx app project, you can find information on preparing your router.  This includes: 
+[Cisco DevNet IOx Community](https://developer.cisco.com/site/iox/index.gsp) is the best place for resources on developing with IOx.  Before beginning this, or any other IOx app project, you can find information on preparing your router.  This includes: 
 
 * installing the correct IOS image 
 * configuing IOS to enable IOx 
 * loading the neccessary cartridges for running applications
 
-This demonstration runs as a Python PaaS application, so follow the preperation for that demonstration.  
+This demonstration runs as a Python PaaS application, so follow the [PaaS QuickStart](https://developer.cisco.com/media/iox-dev-guide-7-12-16/getstarted/quickstart-paas/) preperation for that demonstration.  
 
 ### Serial Port 
 
 Because this demonstration uses the router's Serial Interface to connect to the Arduino, you'll need: 
 
 * Additional configuration to enable the mapping of the Serial Interface to the IOx application
-	* See this link for information []()
+	* See this link for information [Cisco ISR 8xx - Enabling Serial Port](https://developer.cisco.com/media/iox-dev-guide-7-12-16/platforms/platform-isr8xx/#enabling-serial-port)
 * A compatible Serial cable for your router that exposes the TX/RX pins to conenct to the Arduino.  
 
 #### SmartSerial Interface Cable Option
