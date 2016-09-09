@@ -3,6 +3,13 @@ IOx Proof of Concept to integrate a Cisco Router with an Arduino Microcontroller
 
 ![](resources/setup_image2.jpg)
 
+### Table of Contents 
+
+* [Background](#background)
+* [Setup and PreRequisites](#setup_and_prerequisites)
+* [Loading Demo Application](#loading_demo_application)
+* [Running the Demo](#running_the_demo)
+
 ## Background
 
 Many IOT applications involve reading details from sensors, processing the information, and taking some action.  This action could be data storage, sending an alert notification, or updating some other system.  This a isn't new processing flow, what is new with IOT is that this interaction takes place connected to the Internet, or perhaps just an Intranet.  
@@ -38,7 +45,7 @@ In ioxduino, the external sensor running on the Arduino is a basic push button. 
 When a button press is detected by the IOx application it updates a log that is available with a basic REST API call.  
 
 
-# Setup & PreRequisites 
+# Setup and PreRequisites 
 
 To build and replicate this demonstraiton you'll need access to an IOx device with a Serial Port, and a compatible Arduino device.  The original demonstration was created using a **Cisco C819HG-4G-G-K9** router and an **Arduino UNO**, however other models of each could be used.  
 
