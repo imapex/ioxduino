@@ -1,7 +1,7 @@
 # ioxduino
 IOx Proof of Concept to integrate a Cisco Router with an Arduino Microcontroller
 
-![](resources/setup_image2.jpg)
+![](resources/setup_image3.jpg)
 
 ### Table of Contents 
 
@@ -9,6 +9,7 @@ IOx Proof of Concept to integrate a Cisco Router with an Arduino Microcontroller
 * [Setup and PreRequisites](#setup-and-prerequisites)
 * [Loading Demo Application](#loading-demo-application)
 * [Running the Demo](#running-the-demo)
+* [Known Caveats](#known-caveats)
 
 ## Background
 
@@ -80,9 +81,11 @@ The Cisco C819HG-4G-G-K9 router, and several others, leverage a SmartSerial inte
 
 *Links to Amazon above are purely for reference.  We will receive no money if you use them.*
 
-For reference, here is an image showing the breakout of the pins on a standard DB25/RS232 port.  The pins that you'll need are **Pin 2 - Transmit** and **Pin 3 - Receive**.  These will be connected to the opposite pins on the Arduino.  
+If you use a Female DB25 interface, the pins that you'll need are:
 
-![](resources/db25-pinout.gif)
+* **Pin 2 - Receive** connected to **Arduino Pin 1 - TX**
+* **Pin 3 - Transmit** connected to **Arduino Pin 0 - RX** 
+* **Pin 7 - Ground** connected to **Arduino GND**
 
 ## Arduino 
 
@@ -123,13 +126,378 @@ Alternatively, you can order an Arduino Starter Kit that includes the above and 
 
 ![](resources/arduino_diagram.png)
 
+
 # Loading Demo Application
+
+There are two steps to getting this demonstration up and working.  Loading and starting the ioxduino PaaS application on the IOx Device, and loading your Arduino with the sketch.  
+
+Within this repository there are two folders with the needed code.  
+
+* [ardunio_sketches](arduino_sketches/) contains the BasicButtonSerial code for the sample sensor event 
+* [iox_app](iox_app/) contains the needed code to package and deploy ioxduino to your device.  
+
+Begin by cloning the ioxduino repository to your local machine.  
+
+```
+git clone https://github.com/imapex/ioxduino 
+
+# Change to the ioxduino directory
+cd ioxduino/
+
+# View the contents of the repo, you shoudl see something similar
+ls
+LICENSE			arduino_sketches       	resources
+README.md      		iox_app
+
+```
 
 ## IOx PaaS Application
 
+Follow these steps to properly package and deploy ioxduino to your device.  This assumes you already have installed and setup ioxclient on your local machine.  For information on how to do that, see [ioxclient-reference](https://developer.cisco.com/media/iox-dev-guide-7-12-16/ioxclient/ioxclient-reference/) on DevNet.  
+
+*All of these steps will be accomplished from a terminal on your workstation*
+
+1. Enter the iox_app directory.  You should see the following files.  
+
+	```
+	cd iox_app/
+	```
+	
+	| File | Description |
+	| --- | --- | 
+	| package.yaml | YAML formated description of the IOx application |
+	| package_config.ini | Application configuration file (empty) | 
+	| device_mapping.json | Host Router Device Mapping (ie network and serial) | 
+	| requirements.txt | Python requirements list | 
+	| main.py | Python code to run for application | 
+	
+
+2. Create an IOx application package that can be installed to your host device.  
+
+	```
+	ioxclient package .
+	
+	Currently active profile :  default
+	Command Name: package
+	Checking if package descriptor file is present..
+	Created Staging directory at :  /var/folders/dh/t0frtgx514388l6ycj2bl7740000gn/T/238313704
+	Copying contents to staging directory
+	Checking for application runtime type
+	Detected Python application. Attempting to install dependencies present in requirements.txt ..
+	Collecting pyserial (from -r requirements.txt (line 1))
+	  Using cached pyserial-3.1.1-py2.py3-none-any.whl
+	Installing collected packages: pyserial
+	Successfully installed pyserial
+	
+	Successfully installed dependencies..
+	Creating an inner envelope for application artifacts
+	Excluding  package.tar
+	Generated  /var/folders/dh/t0frtgx514388l6ycj2bl7740000gn/T/238313704/artifacts.tar.gz
+	Calculating SHA1 checksum for package contents..
+	Root Directory :  /private/var/folders/dh/t0frtgx514388l6ycj2bl7740000gn/T/238313704
+	Output file:  /var/folders/dh/t0frtgx514388l6ycj2bl7740000gn/T/290598695
+	Path:  artifacts.tar.gz
+	SHA1 : ebb9550385ea63c33565c3f8e18bed9dfe0dfbf8
+	Path:  package.yaml
+	SHA1 : 2ca92ad2d72465d42ebdbfd3c7db2a2aa01d0f3a
+	Path:  package_config.ini
+	SHA1 : da39a3ee5e6b4b0d3255bfef95601890afd80709
+	Generated package manifest at  package.mf
+	Generating IOx Package..
+	Created IOx package at :  /tmp/ioxduino/iox_app/package.tar
+	```
+
+3. Install the ioxduino package onto your router. 
+
+	```
+	ioxclient application install ioxduino package.tar 
+	
+	Currently active profile :  default
+	Command Name: application-install
+	Installation Successful. App is available at : https://10.192.81.81:8443/iox/api/v2/hosting/apps/ioxduino
+	Successfully deployed
+	```
+	
+	* Verify application installed.
+		
+		```
+		ioxclient application list 
+		
+		Currently active profile :  default
+		Command Name: application-list
+		List of installed App :
+		 1. ioxduino   --->   DEPLOYED
+		  
+		```
+	
+4.  Update `device_mapping.json` Serial device name to match your router.  
+	* Get the information about your router's interface. 
+
+		```
+		# List the devices avialable on your platform 
+		ioxclient platform device list
+		
+		Currently active profile :  default
+		Command Name: plt-device-list
+		-------------Device Info----------------
+		{
+		 "serial": [
+		  {
+		   "available": true,				<--- Must show true
+		   "device_id": "/dev/cpts0",		<--- This value for device_mapping.json
+		   "device_name": "serial0",		<--- This indicates the router interface 
+		   "port": 32000,
+		   "slot": 0,
+		   "used_by": null
+		  }
+		 ]
+		}	
+		```
+	
+	* Update `device_mapping.json` to use the correct serial_id.
+	
+		```
+		cat device_mapping.json
+		{
+		  "resources": {
+		    "cpu": "25",
+		    "devices": [
+		      {
+		        "device-id": "/dev/cpts0",	<--- Update this to match
+		        "label": "HOST_DEV1",
+		        "type": "serial"
+		      }
+		    ],
+		    "disk": "100",
+		    "memory": "50",
+		    "network": [
+		      {
+		        "interface-name": "eth0",
+		        "network-name": "iox-bridge0"
+		      }
+		    ],
+		    "profile": "custom"
+		  }
+		}	
+		```
+
+5. Activate ioxduio application 
+
+	```
+	ioxclient application activate ioxduino --payload device_mapping.json
+	
+	Currently active profile :  default
+	Command Name: application-activate
+	Payload file : device_mapping.json. Will pass it as application/json in request body..
+	App ioxduino is Activated	
+	```
+	
+	* Check that ioxduio is now activated
+	
+		```
+		ioxclient application list
+		Currently active profile :  default
+		Command Name: application-list
+		List of installed App :
+		 1. ioxduino   --->  ACTIVATED
+		```
+
+6. Start ioxduino application.  
+
+	```
+	ioxclient application start ioxduino 
+	
+	Currently active profile :  default
+	Command Name: application-start
+	App ioxduino is Started
+	```
+	
+7. Get the IP address assigned to ioxduino
+		
+	```
+	# Run this command to get the details of the started application
+	# If no ipv4 address is displayed, wait a minute and re-run
+	ioxclient application info ioxduino 
+	
+	# Some output not displayed 
+	Currently active profile :  default
+	Command Name: application-info
+	Details of App : ioxduino
+	-----------------------------
+	{
+	 "description": "Monitors External Arduino Sensor and writes collected sensor data to log files",
+	 "name": "ioxduino",
+	 "networkInfo": {
+	  "eth0": {
+	   "ipv4": "192.168.1.16",				<--- This is the IP Address for ioxduion
+	   "ipv6": null,
+	   "libvirt_network": "dpbr_0",
+	   "mac": "52:54:DD:EE:D7:BF",
+	   "mac_address": "52:54:dd:ee:d7:bf",
+	   "network_name": "iox-bridge0",
+	   "port_mappings": {
+	    "tcp": [
+	     [6000,6000]							<--- The TCP port for ioxduio 
+	    	]
+	   }
+	  }
+	 },
+	 "resources": {
+	  "cpu": 25,
+	  "devices": [
+	   {
+	    "device-id": "/dev/cpts0",		<--- Note the Serial Interface
+	    "label": "HOST_DEV1",
+	    "type": "serial",
+	    "usage": "Integrating with Arduino"
+	   }
+	  ]
+	 },
+	 "state": "RUNNING",
+	}	
+
+	```
+
+8. If you've configured your IOx Platform in the default mode where the IOx Guest OS is NAT'd to the WAN interface, you'll need to install a Static NAT entry for port 6000 to the ioxduino IP Address assigned.  If your IOx Platform networking is configured in another way, you can skip this part.  
+	1.  Login to IOS running on your router and enter config mode.  
+
+		```
+		iox#conf t
+		
+		! Replace 192.168.1.16 with the IP address assigned to ioxduio 
+		! If your Outside interface is NOT GigabitEthernet 0, replace it
+		iox(config)#ip nat inside source static tcp 192.168.1.16 6000 interface GigabitEthernet0	6000
+		iox(config)#exit
+		
+		! Verify the NAT Translation was configured 
+		iox#show ip nat translations		
+		Pro Inside global         Inside local          Outside local         Outside global
+		tcp <- RTR IP ->:6000     192.168.1.16:6000     ---                   ---
+		tcp <- RTR IP ->:2222     192.168.3.2:22        ---                   ---
+		tcp <- RTR IP ->:8443     192.168.3.2:8443      ---                   ---		
+		```
+
+9. With ioxduio started, and NAT configured, you can now access the REST API to get a list of alerts.  
+
+	```
+	# Replace RTR_IP with your router's IP address
+	curl RTR_IP:6000/
+	
+	[]
+	
+	# Currently no alerts have been logged
+	```
+	
 
 ## Arduino Sample Sketch 
 
+Before loading the Sample Sketch onto your Arduino, be sure to have built the electrical circuit as shown in the [Component Diagram](#component-diagram).  
+
+*See []() for information on full details using the Arduino IDE.  The steps below assume some familiarity with the process of programming and Arduino*
+
+1. Open `BasicButtonSerial.ino` in the Arduino IDE.  
+2. Make sure your Ardino board and port are configured.  
+3. Upload the Sketch to your Arduino.  
+
+	![](resources/arduino_upload.png)
+
+4. Verify that Arduino is configured properly by opening the Serial Monitor within the IDE and pushing the button.  You should see a message for each button push.  
+
+	![](resources/arduino_serial_monitor.png)
+
+5. Disconnect the USB Cable from the Arduino used to program.  Be sure another power adapter or supply is connected still.  
 
 # Running the Demo
 
+With the both the PaaS application and the Arduino Sketch loaded and tested individually, now you will connect the two devices together for the full demo.  
+
+## Connecting the Serial Devices Together
+
+Depending on the exact type of Serial interface and cable you are using with your router, you may need to update these details.  But if your router serial cable provides a Female DB25 connector (as was used in this demo build) you will use these pin connections.  
+
+* **Pin 2 - Receive** connected to **Arduino Pin 1 - TX**
+* **Pin 3 - Transmit** connected to **Arduino Pin 0 - RX** 
+* **Pin 7 - Ground** connected to **Arduino GND**
+
+## Testing the connection 
+
+Once connected, you can press the button on the Arduino a few times (pause at least a second between presses) to generate some alerts.  Then make an REST API call to ioxduino to see if you're logging alerts.  
+
+```
+curl RTR_IP:6000/
+[["Sun Sep 11 20:52:23 2016", "Alert received."], ["Sun Sep 11 20:52:56 2016", "Alert received."], ["Sun Sep 11 20:53:01 2016", "Alert received."], ["Sun Sep 11 20:53:05 2016", "Alert received."], ["Sun Sep 11 20:53:07 2016", "Alert received."], ["Sun Sep 11 20:53:12 2016", "Alert received."]]
+
+# Pass the returned results through json.tool to pretty the display some 
+curl 10.192.81.81:6000/ | python -m json.tool 
+
+[
+    [
+        "Sun Sep 11 20:52:23 2016",
+        "Alert received."
+    ],
+    [
+        "Sun Sep 11 20:52:56 2016",
+        "Alert received."
+    ],
+    [
+        "Sun Sep 11 20:53:01 2016",
+        "Alert received."
+    ],
+    [
+        "Sun Sep 11 20:53:05 2016",
+        "Alert received."
+    ],
+    [
+        "Sun Sep 11 20:53:07 2016",
+        "Alert received."
+    ],
+    [
+        "Sun Sep 11 20:53:12 2016",
+        "Alert received."
+    ]
+]
+```
+
+You can also use ioxclient to connect to the console of the running app to monitor the output from the router.  
+
+```
+ioxclient app console ioxduino
+
+# Some output removed
+Currently active profile :  default
+Command Name: application-console
+.
+.
+Connected to domain ioxduino
+.
+Poky (Yocto Project Reference Distro) 1.7.2 isr800-lxc /dev/tty1
+
+isr800-lxc login: Serving on port 0.0.0.0:6000
+Serial:  Serial<id=0x10144110, open=True>(port='/dev/cpts0', baudrate=9600, bytesize=8, parity='N', stopbits=1, timeout=5, xonxoff=False, rtscts=False, dsrdtr=False)
+
+10.192.81.112 - - [11/Sep/2016 20:13:39] "GET / HTTP/1.1" 200 2
+10.192.81.112 - - [11/Sep/2016 20:50:29] "GET / HTTP/1.1" 200 2
+Incoming Data found.
+10.192.81.112 - - [11/Sep/2016 20:52:46] "GET / HTTP/1.1" 200 49
+10.192.81.112 - - [11/Sep/2016 20:52:49] "GET / HTTP/1.1" 200 49
+Incoming Data found.
+Incoming Data found.
+Incoming Data found.
+Incoming Data found.
+Incoming Data found.
+10.192.81.112 - - [11/Sep/2016 20:53:16] "GET / HTTP/1.1" 200 294
+10.192.81.112 - - [11/Sep/2016 20:56:22] "GET / HTTP/1.1" 200 294
+
+```
+
+In the above output you can see 6 instances of **Incoming Data found.** indicating an alert recieved from the Arduino, and 6 API requests recieved.  
+
+# Known Caveats 
+
+## Serial Encoding Error
+
+In it's current state, ioxduino will log an event whenever Serial data is found incoming from the Arduino, however no incoming data is actually processed.  This limits the current utility of this configuration to simple OPEN/CLOSE sensors, and a single sensor per Arduino.  
+
+The reason for this limitation is an encoding conflict with data written by the Arduino to the Serial port not being able to be automatically decoded by the Python applicaiton running on the IOx router.  
+
+I am actively working to identify the exact type of data being encoded so that this limitation can be resolved in future versions of ioxduino.  
