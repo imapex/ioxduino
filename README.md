@@ -329,7 +329,7 @@ Follow these steps to properly package and deploy ioxduino to your device.  This
 	 "name": "ioxduino",
 	 "networkInfo": {
 	  "eth0": {
-	   "ipv4": "192.168.1.16",				<--- This is the IP Address for ioxduion
+	   "ipv4": "192.168.1.16",				<--- This is the IP Address for ioxduino
 	   "ipv6": null,
 	   "libvirt_network": "dpbr_0",
 	   "mac": "52:54:DD:EE:D7:BF",
@@ -337,7 +337,7 @@ Follow these steps to properly package and deploy ioxduino to your device.  This
 	   "network_name": "iox-bridge0",
 	   "port_mappings": {
 	    "tcp": [
-	     [6000,6000]							<--- The TCP port for ioxduio 
+	     [6000,6000]							<--- The TCP port for ioxduino 
 	    	]
 	   }
 	  }
@@ -366,7 +366,7 @@ Follow these steps to properly package and deploy ioxduino to your device.  This
 		
 		! Replace 192.168.1.16 with the IP address assigned to ioxduio 
 		! If your Outside interface is NOT GigabitEthernet 0, replace it
-		iox(config)#ip nat inside source static tcp 192.168.1.16 6000 interface GigabitEthernet0	6000
+		iox(config)#ip nat inside source static tcp 192.168.1.16 6000 interface GigabitEthernet0 6000
 		iox(config)#exit
 		
 		! Verify the NAT Translation was configured 
@@ -377,7 +377,7 @@ Follow these steps to properly package and deploy ioxduino to your device.  This
 		tcp <- RTR IP ->:8443     192.168.3.2:8443      ---                   ---		
 		```
 
-9. With ioxduio started, and NAT configured, you can now access the REST API to get a list of alerts.  
+9. With ioxduino started, and NAT configured, you can now access the REST API to get a list of alerts.  
 
 	```
 	# Replace RTR_IP with your router's IP address
