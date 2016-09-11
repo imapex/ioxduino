@@ -45,7 +45,9 @@ void loop() {
   
   // Write out alert if one exists.  
   if (alertComplete) {
-    Serial.println(outputString);
+    Serial.print(outputString);
+    Serial.print('\r');
+    Serial.print('\n');
     // clear the string:
     outputString = "";
     alertComplete = false;
