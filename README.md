@@ -1,7 +1,7 @@
 # ioxduino
 IOx Proof of Concept to integrate a Cisco Router with an Arduino Microcontroller
 
-![](resources/setup_image3.jpg)
+![](resources/setup_image4.jpg)
 
 ### Table of Contents 
 
@@ -83,9 +83,9 @@ The Cisco C819HG-4G-G-K9 router, and several others, leverage a SmartSerial inte
 
 If you use a Female DB25 interface, the pins that you'll need are:
 
-* **Pin 2 - Receive** connected to **Arduino Pin 1 - TX**
-* **Pin 3 - Transmit** connected to **Arduino Pin 0 - RX** 
-* **Pin 7 - Ground** connected to **Arduino GND**
+* **Pin 2 - Receive** connected to **RS232 Shifter Pin 2: Tx**
+* **Pin 3 - Transmit** connected to **RS232 Shifter Pin 3: Rx** 
+* **Pin 7 - Ground** connected to **RS232 Shifter Pin 5: Ground**
 
 ## Arduino 
 
@@ -121,6 +121,17 @@ Alternatively, you can order an Arduino Starter Kit that includes the above and 
 [Adafruit Arduino Starter Pack](https://www.adafruit.com/products/68)
 
 *Links to Adafruit above are purely for reference.  We will receive no money if you use them.*
+
+#### Arduino Serial TTL to RS232 
+
+The Arduino Serial communciations operate using TTL, while the IOx router uses RS232.  These mechanisms are NOT directly compatible, and attempts to do so can damage your Arduino.  You can translate between them using a few different methods.  For this demo, I used an RS232 Shifter available from Sparkfun to make it simple and easy.  
+
+| Description | Link | 
+| ----------- | ---- | 
+| RS232 Shifter | [Sparkfun](https://www.sparkfun.com/products/449) |
+| DB9 Breakout | [Amazon](https://www.amazon.com/Swellder-Breakout-Terminals-Connector-Terminal/dp/B00Z2LIHAC/ref=sr_1_3?ie=UTF8&qid=1474033119&sr=8-3&keywords=db9+breakout) |
+
+*Links to Sparkfun and Amazon above are purely for reference.  We will receive no money if you use them.*
 
 ### Component Diagram 
 
@@ -415,9 +426,9 @@ With the both the PaaS application and the Arduino Sketch loaded and tested indi
 
 Depending on the exact type of Serial interface and cable you are using with your router, you may need to update these details.  But if your router serial cable provides a Female DB25 connector (as was used in this demo build) you will use these pin connections.  
 
-* **Pin 2 - Receive** connected to **Arduino Pin 1 - TX**
-* **Pin 3 - Transmit** connected to **Arduino Pin 0 - RX** 
-* **Pin 7 - Ground** connected to **Arduino GND**
+* **Pin 2 - Receive** connected to **RS232 Shifter Pin 2: Tx**
+* **Pin 3 - Transmit** connected to **RS232 Shifter Pin 3: Rx** 
+* **Pin 7 - Ground** connected to **RS232 Shifter Pin 5: Ground**
 
 ## Testing the connection 
 
@@ -425,35 +436,39 @@ Once connected, you can press the button on the Arduino a few times (pause at le
 
 ```
 curl RTR_IP:6000/
-[["Sun Sep 11 20:52:23 2016", "Alert received."], ["Sun Sep 11 20:52:56 2016", "Alert received."], ["Sun Sep 11 20:53:01 2016", "Alert received."], ["Sun Sep 11 20:53:05 2016", "Alert received."], ["Sun Sep 11 20:53:07 2016", "Alert received."], ["Sun Sep 11 20:53:12 2016", "Alert received."]]
+[["Fri Sep 16 12:39:52 2016", "Button 6 pressed."], ["Fri Sep 16 12:40:05 2016", "Button 6 pressed."], ["Fri Sep 16 12:40:07 2016", "Button 6 pressed."], ["Fri Sep 16 12:40:09 2016", "Button 6 pressed."], ["Fri Sep 16 12:40:12 2016", "Button 6 pressed."], ["Fri Sep 16 12:40:13 2016", "Button 6 pressed."], ["Fri Sep 16 12:40:17 2016", "Button 6 pressed."]]
 
 # Pass the returned results through json.tool to pretty the display some 
 curl 10.192.81.81:6000/ | python -m json.tool 
 
 [
     [
-        "Sun Sep 11 20:52:23 2016",
-        "Alert received."
+        "Fri Sep 16 12:39:52 2016",
+        "Button 6 pressed."
     ],
     [
-        "Sun Sep 11 20:52:56 2016",
-        "Alert received."
+        "Fri Sep 16 12:40:05 2016",
+        "Button 6 pressed."
     ],
     [
-        "Sun Sep 11 20:53:01 2016",
-        "Alert received."
+        "Fri Sep 16 12:40:07 2016",
+        "Button 6 pressed."
     ],
     [
-        "Sun Sep 11 20:53:05 2016",
-        "Alert received."
+        "Fri Sep 16 12:40:09 2016",
+        "Button 6 pressed."
     ],
     [
-        "Sun Sep 11 20:53:07 2016",
-        "Alert received."
+        "Fri Sep 16 12:40:12 2016",
+        "Button 6 pressed."
     ],
     [
-        "Sun Sep 11 20:53:12 2016",
-        "Alert received."
+        "Fri Sep 16 12:40:13 2016",
+        "Button 6 pressed."
+    ],
+    [
+        "Fri Sep 16 12:40:17 2016",
+        "Button 6 pressed."
     ]
 ]
 ```
@@ -476,28 +491,21 @@ isr800-lxc login: Serving on port 0.0.0.0:6000
 Serial:  Serial<id=0x10144110, open=True>(port='/dev/cpts0', baudrate=9600, bytesize=8, parity='N', stopbits=1, timeout=5, xonxoff=False, rtscts=False, dsrdtr=False)
 
 10.192.81.112 - - [11/Sep/2016 20:13:39] "GET / HTTP/1.1" 200 2
-10.192.81.112 - - [11/Sep/2016 20:50:29] "GET / HTTP/1.1" 200 2
 Incoming Data found.
-10.192.81.112 - - [11/Sep/2016 20:52:46] "GET / HTTP/1.1" 200 49
-10.192.81.112 - - [11/Sep/2016 20:52:49] "GET / HTTP/1.1" 200 49
+Type: <type 'str'>
+['Fri Sep 16 12:39:52 2016', 'Button 6 pressed.']
 Incoming Data found.
+Type: <type 'str'>
+['Fri Sep 16 12:40:05 2016', 'Button 6 pressed.']
+10.192.81.112 - - [11/Sep/2016 20:13:39] "GET / HTTP/1.1" 200 2
 Incoming Data found.
-Incoming Data found.
-Incoming Data found.
-Incoming Data found.
-10.192.81.112 - - [11/Sep/2016 20:53:16] "GET / HTTP/1.1" 200 294
-10.192.81.112 - - [11/Sep/2016 20:56:22] "GET / HTTP/1.1" 200 294
+Type: <type 'str'>
+['Fri Sep 16 12:40:07 2016', 'Button 6 pressed.']
+10.192.81.112 - - [11/Sep/2016 20:13:39] "GET / HTTP/1.1" 200 2
 
 ```
 
-In the above output you can see 6 instances of **Incoming Data found.** indicating an alert recieved from the Arduino, and 6 API requests recieved.  
+In the above output you can see 3 instances of **Incoming Data found.** indicating an alert recieved from the Arduino, and 3 API requests recieved.  
 
 # Known Caveats 
 
-## Serial Encoding Error
-
-In it's current state, ioxduino will log an event whenever Serial data is found incoming from the Arduino, however no incoming data is actually processed.  This limits the current utility of this configuration to simple OPEN/CLOSE sensors, and a single sensor per Arduino.  
-
-The reason for this limitation is an encoding conflict with data written by the Arduino to the Serial port not being able to be automatically decoded by the Python applicaiton running on the IOx router.  
-
-I am actively working to identify the exact type of data being encoded so that this limitation can be resolved in future versions of ioxduino.  
