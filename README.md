@@ -492,14 +492,11 @@ Serial:  Serial<id=0x10144110, open=True>(port='/dev/cpts0', baudrate=9600, byte
 
 10.192.81.112 - - [11/Sep/2016 20:13:39] "GET / HTTP/1.1" 200 2
 Incoming Data found.
-Type: <type 'str'>
 ['Fri Sep 16 12:39:52 2016', 'Button 6 pressed.']
 Incoming Data found.
-Type: <type 'str'>
 ['Fri Sep 16 12:40:05 2016', 'Button 6 pressed.']
 10.192.81.112 - - [11/Sep/2016 20:13:39] "GET / HTTP/1.1" 200 2
 Incoming Data found.
-Type: <type 'str'>
 ['Fri Sep 16 12:40:07 2016', 'Button 6 pressed.']
 10.192.81.112 - - [11/Sep/2016 20:13:39] "GET / HTTP/1.1" 200 2
 
