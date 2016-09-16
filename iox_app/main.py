@@ -93,28 +93,17 @@ class SerialThread(threading.Thread):
                 break
             # Check if there is incoming data waiting on the serial line
             while sdev.inWaiting() > 0:
-                # There is something strange with the decoding that happens
-                # of incoming data running on an IOx device (at least 819)
-                # For now using simpler code to just see if an event was triggered
-                # And log that, rather than grabbing data from the event
+                # The below code attempts to read data from serial line
+                # to fill in alert.
                 print("Incoming Data found.")
-                sdev.reset_input_buffer()
-                newalert = [datetime.strftime(datetime.now(), '%c'), "Alert received."]
+                # Remove the trailing \r\n characters
+                sensVal = sdev.readline()[:-2]
+
+                # Create a new alert
+                newalert = [datetime.strftime(datetime.now(), '%c'), sensVal]
+                print(newalert)
+                # Add new alert to the list
                 alerts.append(newalert)
-
-                # # The below code attempts to read data from serial line
-                # # to fill in alert.
-                # print("Incoming Data found.")
-                # # Remove the trailing \r\n characters
-                # sensVal = sdev.readline()[:-2]
-                # print("Type: " + str(type(sensVal)))
-                #
-                # # Create a new alert
-                # newalert = [datetime.strftime(datetime.now(), '%c'), sensVal]
-                # print(newalert)
-                # # Add new alert to the list
-                # alerts.append(newalert)
-
 
                 # Wait a second before continueing
                 time.sleep(1)
